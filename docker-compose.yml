@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    volumes:
+      - ./allure-results:/tests/allure-results
+      - ./tests:/tests/tests
+      - ./video:/tests/video
+    environment:
+      - PYTHONUNBUFFERED=1
+    shm_size: '2gb'
+    networks:
+      - test-network
+
+  allure:
+    image: frankescobar/allure-docker-service
+    environment:
+      CHECK_RESULTS_EVERY_SECONDS: 1
+      KEEP_HISTORY: 1
+    ports:
+      - "5050:5050"
+    volumes:
+      - ./allure-results:/app/allure-results
+    networks:
+      - test-network
+
+networks:
+  test-network:
+    driver: bridge
